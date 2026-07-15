@@ -244,6 +244,7 @@ export async function signOut() {
 
 ### The Three Pieces
 
+
 **1. Manifest (`public/manifest.json`)**
 - Defines app metadata: name, icon, colors, display mode.
 - Browser reads this to decide if PWA is installable.
