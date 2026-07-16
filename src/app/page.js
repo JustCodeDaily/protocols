@@ -1,21 +1,19 @@
-
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+
+  if (!claims?.sub) redirect("/login");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-       
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-             hello world!
-          </h1>
-        
-        </div>
-
-      </main>
-    </div>
-
+    <main className="flex flex-1 items-center justify-center bg-zinc-50 px-6 font-sans dark:bg-black">
+      <section className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-sm dark:bg-zinc-950">
+        <p className="text-sm text-zinc-500">Signed in securely</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Welcome to SwipeHabit</h1>
+      </section>
+    </main>
   );
 }
