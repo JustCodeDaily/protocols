@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
-
 export async function updateSession(request) {
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
@@ -13,27 +12,23 @@ export async function updateSession(request) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-        },
-      },
-    },
+        }
+      }
+    }
   );
-
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
   const { pathname } = request.nextUrl;
   const isPublicRoute = pathname === "/login" || pathname.startsWith("/auth/");
-
   if (!claims?.sub && !isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
-
   if (claims?.sub && pathname === "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
   }
-
   return response;
 }
