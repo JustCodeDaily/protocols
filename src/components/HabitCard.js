@@ -7,14 +7,16 @@ export function HabitCard({ habit, isTop, onSwipe, zIndex }) {
   const opacity = useTransform(x, [-250, -150, 0, 150, 250], [0, 1, 1, 1, 0]);
   const yesOpacity = useTransform(x, [0, 150], [0, 1]);
   const noOpacity = useTransform(x, [0, -150], [0, 1]);
-  const handleDragEnd = (event, info) => {
+
+  const handleDragEnd = (e, info) => {
     const threshold = 180;
     if (info.offset.x > threshold) {
       onSwipe("right");
     } else if (info.offset.x < -threshold) {
       onSwipe("left");
     }
-  };
+  }
+
   return <motion.div
     className="absolute top-0 left-0 right-0 h-96 w-full max-w-sm mx-auto"
     style={{
