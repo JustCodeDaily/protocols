@@ -13,6 +13,7 @@ export const metadata = {
   description: "A private, swipe-based habit tracker."
 };
 import { TopNav } from "@/components/TopNav";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 export default function RootLayout({ children }) {
   return <html
     lang="en"
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
   >
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="theme-color" content="#ffffff" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -39,6 +41,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-full flex flex-col relative">
+        <ServiceWorkerRegister />
         <TopNav />
         {children}
       </body>
