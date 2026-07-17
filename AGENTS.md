@@ -1,7 +1,7 @@
 # AGENT.md — SwipeHabit
 
 ## Role
-You are the engineering agent building **SwipeHabit**, a mobile-only, swipe-based habit tracker PWA. You write production-quality TypeScript, follow the schema below exactly, and do not invent architecture that isn't specified here. If something is ambiguous, ask — don't assume.
+You are the engineering agent building **SwipeHabit**, a mobile-only, swipe-based habit tracker PWA. You write production-quality JavaScript / React, follow the schema below exactly, and do not invent architecture that isn't specified here. If something is ambiguous, ask — don't assume.
 
 ---
 
@@ -30,7 +30,7 @@ One habit = one question on a card. The user answers by swiping.
 - **Recharts** — analytics bar charts
 - **Serwist** — PWA/offline shell
 - **Vercel** — deploy target
-- **TypeScript** throughout. JSDoc-style comments allowed on top of TS types where logic isn't self-evident (max 2 lines per comment).
+- **JS** throughout. JSDoc-style comments allowed where logic isn't self-evident (max 2 lines per comment).
 
 ---
 
@@ -125,7 +125,7 @@ Three icons, top-middle of screen, in this exact order:
 
 ### Implementation
 **Client-side (login screen):**
-```typescript
+```javascript
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
@@ -144,7 +144,7 @@ export async function signInWithGoogle() {
 ```
 
 **OAuth callback route (`/auth/callback`):**
-```typescript
+```javascript
 // app/auth/callback/route.ts
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
 ```
 
 **Check auth state (in Server Component):**
-```typescript
+```javascript
 // app/page.tsx (Server Component)
 import { createClient } from "@/utils/supabase/server";
 
@@ -213,7 +213,7 @@ create policy "users_can_only_delete_own_habits"
 **Same policies apply to `habit_logs`.** Without these, a malicious client could query another user's data by guessing their UUID. RLS makes this impossible.
 
 **Client-side query (after RLS is in place):**
-```typescript
+```javascript
 // No need to filter by user_id; RLS does it automatically.
 const { data: habits, error } = await supabase
   .from("habits")
@@ -224,7 +224,7 @@ const { data: habits, error } = await supabase
 ```
 
 ### Logout
-```typescript
+```javascript
 export async function signOut() {
   const supabase = createClient();
   await supabase.auth.signOut();
@@ -292,7 +292,7 @@ export async function signOut() {
 ```
 
 **Link manifest in `app/layout.tsx`:**
-```typescript
+```javascript
 // app/layout.tsx
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -311,7 +311,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 **Service Worker (Serwist) in `next.config.ts`:**
-```typescript
+```javascript
 import { withSerwistInit } from "@serwist/next";
 
 const nextConfig = {
@@ -325,7 +325,7 @@ export default withSerwistInit({
 ```
 
 **Service Worker code (`app/sw.ts`):**
-```typescript
+```javascript
 // Serwist handles caching automatically.
 // On first load: caches all static assets (JS, CSS, icons, fonts).
 // On subsequent loads: serves from cache if available, falls back to network.
@@ -404,7 +404,7 @@ npm run start
 
 ## Working Style
 - Ship one full vertical slice before moving to the next: deck screen working end-to-end (swipe → write → refetch) before touching `/questions` or `/analytics`.
-- Comments: max 2 lines, explain *why*, not *what*. TypeScript types should make the *what* obvious already.
+- Comments: max 2 lines, explain *why*, not *what*.
 - If a requirement here is ambiguous (e.g. monthly chart granularity), **ask before assuming.**
 - Don't introduce new tables, columns, or libraries not listed above without flagging it first.
 
