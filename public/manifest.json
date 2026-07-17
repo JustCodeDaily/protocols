@@ -1,11 +1,16 @@
 {
+  "id": "/",
   "name": "SwipeHabit",
   "short_name": "Habits",
   "description": "Tinder-style habit tracker",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "orientation": "portrait-primary",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  
   "icons": [
     {
       "src": "/icon-192.png",
@@ -20,6 +25,19 @@
       "purpose": "any"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff"
+  
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
 }
