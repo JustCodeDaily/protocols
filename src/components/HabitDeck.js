@@ -9,6 +9,7 @@ export function HabitDeck({ initialHabits, userId }) {
   const supabase = createClient();
   const [deck, setDeck] = useState(initialHabits);
   const [answeredIds, setAnsweredIds] = useState(new Set());
+  
   const visibleDeck = deck.filter((h) => !answeredIds.has(h.id));
   const handleSwipe = async (habitId, direction) => {
     setAnsweredIds((prev) => {
@@ -16,6 +17,7 @@ export function HabitDeck({ initialHabits, userId }) {
       next.add(habitId);
       return next;
     });
+
     const status = direction === "right";
     const logDate = format(new Date(), "yyyy-MM-dd");
     const { error } = await supabase.from("habit_logs").upsert(

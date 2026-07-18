@@ -1,7 +1,7 @@
 # AGENT.md — SwipeHabit
 
 ## Role
-You are the engineering agent building **SwipeHabit**, a mobile-only, swipe-based habit tracker PWA. You write production-quality JavaScript / React, follow the schema below exactly, and do not invent architecture that isn't specified here. If something is ambiguous, ask — don't assume.
+You are the engineering agent building **SwipeHabit**, a mobile-only, swipe-based habit tracker. You write production-quality JavaScript / React, follow the schema below exactly, and do not invent architecture that isn't specified here. If something is ambiguous, ask — don't assume.
 
 ---
 
@@ -18,7 +18,6 @@ One habit = one question on a card. The user answers by swiping.
 
 ## Platform
 - **Mobile only.** Do not design or reason about desktop breakpoints, hover states, or wide layouts. Every screen is a phone viewport.
-- **PWA**, installable, offline-shell via Serwist.
 - No analytics SDK, no third-party tracking. The "Analytics" icon refers to the in-app stats screen only (see below).
 
 ---
@@ -28,7 +27,6 @@ One habit = one question on a card. The user answers by swiping.
 - **Supabase** — Postgres + RLS + Google OAuth (PKCE flow)
 - **framer-motion** — swipe gesture + card transitions
 - **Recharts** — analytics bar charts
-- **Serwist** — PWA/offline shell
 - **Vercel** — deploy target
 - **JS** throughout. JSDoc-style comments allowed where logic isn't self-evident (max 2 lines per comment).
 
@@ -178,11 +176,6 @@ export default async function Home() {
 }
 ```
 
-### Session Persistence (PWA)
-- Supabase SDK stores the session in `localStorage` automatically.
-- On app resume (PWA installed, user re-opens), `getUser()` returns the cached session without a network call.
-- If the session is expired (token older than 1 hour by default), `getUser()` refreshes it silently using the refresh token.
-- **No manual session sync needed.** Supabase handles it.
 
 ### RLS (Row Level Security) — Enforces User Isolation
 Every `habits` and `habit_logs` query must be scoped to the authenticated user.
@@ -240,157 +233,9 @@ export async function signOut() {
 
 ---
 
-## PWA (Progressive Web App) — Installation & Offline
 
 ### The Three Pieces
 
-
-**1. Manifest (`public/manifest.json`)**
-- Defines app metadata: name, icon, colors, display mode.
-- Browser reads this to decide if PWA is installable.
-- Appears on "Add to Home Screen" prompt.
-
-**2. Service Worker (Serwist)**
-- Intercepts all network requests from the app.
-- Caches responses on first load.
-- Serves cached responses when offline.
-- Keeps the app shell (HTML, JS, CSS) fresh, but caches it aggressively.
-
-**3. Browser Prompt**
-- After service worker installs, browser automatically shows "Add to Home Screen" prompt (iOS/Android).
-- User taps → icon added to home screen → app opens in fullscreen, looks native.
-
-### Implementation
-
-**Manifest (`public/manifest.json`):**
-```json
-{
-  "name": "SwipeHabit",
-  "short_name": "Habits",
-  "description": "Tinder-style habit tracker",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff"
-}
-```
-
-**Link manifest in `app/layout.tsx`:**
-```javascript
-// app/layout.tsx
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      </head>
-      <body>{children}</body>
-    </html>
-  );
-}
-```
-
-**Service Worker (Serwist) in `next.config.ts`:**
-```javascript
-import { withSerwistInit } from "@serwist/next";
-
-const nextConfig = {
-  // ...existing config
-};
-
-export default withSerwistInit({
-  swSrc: "app/sw.ts",
-  swDest: "public/sw.js",
-})(nextConfig);
-```
-
-**Service Worker code (`app/sw.ts`):**
-```javascript
-// Serwist handles caching automatically.
-// On first load: caches all static assets (JS, CSS, icons, fonts).
-// On subsequent loads: serves from cache if available, falls back to network.
-// When offline: returns cached responses. If no cache, shows offline fallback.
-
-import { defaultHandler, NavigationRoute, cleanupOutdatedCaches } from "serwist";
-import { registerRoute } from "serwist/legacy";
-
-// Cache CSS, JS, fonts, images aggressively.
-registerRoute(
-  ({ request }) =>
-    request.destination === "style" ||
-    request.destination === "script" ||
-    request.destination === "font" ||
-    request.destination === "image",
-  new CacheFirst({
-    cacheName: "static-assets",
-    plugins: [new ExpirationPlugin({ maxEntries: 100, maxAgeSeconds: 30 * 24 * 60 * 60 })],
-  })
-);
-
-// API calls (Supabase) use network-first: try network, fall back to cache.
-registerRoute(
-  ({ url }) => url.origin === "your-supabase-project.supabase.co",
-  new NetworkFirst({
-    cacheName: "api-cache",
-    networkTimeoutSeconds: 5, // Wait 5s, then use cache if available.
-  })
-);
-
-// Clean up old caches on update.
-cleanupOutdatedCaches();
-```
-
-### How Installation Works (User Flow)
-
-1. **First visit:** User opens `https://swipenabits.vercel.app` in browser.
-2. **Vercel serves app:** Next.js HTML + JS + Serwist service worker are delivered.
-3. **Service worker installs:** Serwist runs `install` event, caches all static assets locally.
-4. **Browser detects PWA:** Browser reads `manifest.json`, sees service worker is installed.
-5. **Installation prompt:** Browser shows "Add to Home Screen" prompt (automatic on Android, manual on iOS via share menu).
-6. **User taps "Add":** App icon appears on home screen.
-7. **App opens from icon:** User taps icon → app launches in fullscreen, looks native. No browser chrome.
-8. **Offline works:** Service worker intercepts requests, serves cached responses.
-9. **Online sync:** When connection available, Supabase API calls resume, habit logs sync.
-
-### Offline Behavior
-- **App shell (UI):** Always cached, always works offline.
-- **Habit data (read):** Cached from last sync. User can view yesterday's habits even without internet.
-- **Habit data (write):** Queued locally, synced when online (handled by Supabase SDK + service worker network-first strategy).
-- **No syncing indicator yet:** For MVP, assume good connectivity. Add a "syncing..." indicator later if needed.
-
-### Key Configuration
-- **Service Worker file:** must be at `public/sw.js` (Serwist handles compilation from `app/sw.ts`).
-- **Manifest:** must be at `public/manifest.json`.
-- **Icons:** must be at `public/icon-192.png` and `public/icon-512.png` (create these as part of design assets).
-- **HTTPS only:** PWA requires HTTPS (Vercel provides this by default; localhost works too for dev).
-
-### Testing PWA (Local Dev)
-```bash
-npm run build
-npm run start
-# Navigate to http://localhost:3000 in Chrome DevTools > Application > Service Workers
-# You should see the service worker registered and running.
-```
 
 ---
 - Desktop/responsive web layout
@@ -411,5 +256,4 @@ npm run start
 ---
 
 **Status:** Locked spec, ready to build.
-**Platform:** Mobile PWA only.
 **Gestures:** Swipe left, swipe right, chevron skip. Nothing else.

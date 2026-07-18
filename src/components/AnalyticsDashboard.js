@@ -67,9 +67,9 @@ export function AnalyticsDashboard({ habits, logs }) {
   }, []);
   if (!mounted) return null;
   return <div className="mx-auto w-full max-w-md pt-24 pb-8">
-      <h2 className="mb-6 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 text-center">Analytics</h2>
-
-      <div className="flex justify-center gap-2 mb-8">
+      <h2 className="mb-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 text-center">Analytics</h2>
+      
+      <div className={`flex justify-center gap-2 mb-8`}>
         {["Today", "Weekly", "Monthly", "Overall"].map((v) => <button
     key={v}
     onClick={() => setView(v)}
