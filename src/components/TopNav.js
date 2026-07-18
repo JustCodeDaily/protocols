@@ -7,8 +7,10 @@ import { createClient } from "@/lib/supabase/client";
 
 export function TopNav() {
   const [theme, setTheme] = useState("light")
+  const [user, setUser] = useState(null)
   const pathname = usePathname()
   const router = useRouter()
+  const supabase = createClient();
 
   useEffect(() => {
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -16,6 +18,15 @@ export function TopNav() {
     } else {
       setTheme("light");
     }
+    
+    supabase.auth.getUser().then(({ data }) => setUser(data?.user));
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+    
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, [])
 
   const toggleTheme = () => {
@@ -31,14 +42,19 @@ export function TopNav() {
   }
 
   const handleLogout = async () => {
-    const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
   }
 
   return <nav className="flex w-full items-center justify-center gap-8 py-4 bg-transparent absolute top-0 left-0 right-0 z-50">
-      <Link href={pathname === "/" ? "/questions" : "/"} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-        {pathname === "/" ? <PenSquare className="h-6 w-6" /> : <Home className="h-6 w-6" />}
+      {pathname !== "/" && (
+        <Link href="/" className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+          <Home className="h-6 w-6" />
+        </Link>
+      )}
+
+      <Link href="/questions" className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+        <PenSquare className="h-6 w-6" />
       </Link>
       
       <button onClick={toggleTheme} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
@@ -49,8 +65,10 @@ export function TopNav() {
         <BarChart2 className="h-6 w-6" />
       </Link>
 
-      <button onClick={handleLogout} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-        <LogOut className="h-6 w-6" />
-      </button>
+      {user && (
+        <button onClick={handleLogout} className="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+          <LogOut className="h-6 w-6" />
+        </button>
+      )}
     </nav>
 }
