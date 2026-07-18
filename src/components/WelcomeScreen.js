@@ -10,7 +10,7 @@ export function WelcomeScreen() {
 
   const handleSave = async () => {
     if (!name.trim()) return;
-    const { error } = await supabase.auth.updateUser({
+  const { data, error } = await supabase.auth.updateUser({
       data: { display_name: name.trim() }
     });
     if (!error) {
