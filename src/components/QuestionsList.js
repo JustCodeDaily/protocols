@@ -10,6 +10,7 @@ export function QuestionsList({ initialHabits, userId }) {
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editQuestion, setEditQuestion] = useState("");
+  
   const handleAdd = async () => {
     if (!newTitle.trim() || !newQuestion.trim()) return;
     const { data, error } = await supabase.from("habits").insert({
@@ -55,18 +56,18 @@ export function QuestionsList({ initialHabits, userId }) {
     placeholder="Title (e.g. Hit Gym)"
     value={newTitle}
     onChange={(e) => setNewTitle(e.target.value)}
-    className="mb-3 w-full rounded-lg border border-zinc-200 p-3 text-sm bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+    className="mb-3 w-full rounded-lg border border-zinc-200 p-3 text-sm bg-white text-zinc-900 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
   />
         <input
     type="text"
     placeholder="Question (e.g. Did you hit the gym?)"
     value={newQuestion}
     onChange={(e) => setNewQuestion(e.target.value)}
-    className="mb-4 w-full rounded-lg border border-zinc-200 p-3 text-sm bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+    className="mb-4 w-full rounded-lg border border-zinc-200 p-3 text-sm bg-white text-zinc-900 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
   />
         <button
     onClick={handleAdd}
-    className="flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 p-3 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+    className="flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 p-3 text-sm font-medium text-white disabled:opacity-50 hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
   >
           <Plus className="h-4 w-4" /> Add Question
         </button>
