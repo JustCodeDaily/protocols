@@ -9,19 +9,19 @@ Below is the high-level architecture flow of the SwipeHabit application:
 ```mermaid
 flowchart TD
     subgraph Client ["Client (Browser/PWA)"]
-        UI[Next.js React Server & Client Components]
-        Gestures[Framer Motion - Swipe Engine]
-        Charts[Recharts - Analytics]
+        UI["Next.js React Server & Client Components"]
+        Gestures["Framer Motion - Swipe Engine"]
+        Charts["Recharts - Analytics"]
         
         UI --> Gestures
         UI --> Charts
     end
 
     subgraph Backend ["Backend as a Service"]
-        Supabase[Supabase]
-        Auth[Google OAuth (PKCE Flow)]
-        DB[(PostgreSQL Database)]
-        RLS[Row Level Security]
+        Supabase["Supabase"]
+        Auth["Google OAuth (PKCE Flow)"]
+        DB[("PostgreSQL Database")]
+        RLS["Row Level Security"]
 
         Supabase --> Auth
         Supabase --> RLS
