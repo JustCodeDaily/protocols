@@ -34,7 +34,7 @@ export function TourScreen() {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
-      <div className="relative h-96 w-full max-w-sm">
+      <div className="relative h-[345px] w-full max-w-sm">
         {stack.map((card, index) => {
           const isTop = index === stack.length - 1;
           return (

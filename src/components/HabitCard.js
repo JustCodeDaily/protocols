@@ -5,12 +5,12 @@ export function HabitCard({ habit, isTop, onSwipe, zIndex }) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-180, 180], [-45, 45]);
   const restrictSwipe = habit.restrictSwipe;
-  const opacity = useTransform(x, [-250, -150, 0, 150, 250], [0, 1, 1, 1, 0]);
-  const yesOpacity = useTransform(x, [0, 150], [0, restrictSwipe === "right" ? 0 : 1]);
-  const noOpacity = useTransform(x, [0, -150], [0, restrictSwipe === "left" ? 0 : 1]);
+  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
+  const yesOpacity = useTransform(x, [0, 100], [0, restrictSwipe === "right" ? 0 : 1]);
+  const noOpacity = useTransform(x, [0, -100], [0, restrictSwipe === "left" ? 0 : 1]);
 
   const handleDragEnd = (e, info) => {
-    const threshold = 180;
+    const threshold = 100;
     if (info.offset.x > threshold && restrictSwipe !== "right") {
       onSwipe("right");
     } else if (info.offset.x < -threshold && restrictSwipe !== "left") {
@@ -19,7 +19,7 @@ export function HabitCard({ habit, isTop, onSwipe, zIndex }) {
   }
 
   return <motion.div
-    className="absolute top-0 left-0 right-0 h-96 w-full max-w-sm mx-auto"
+    className="absolute top-0 left-0 right-0 h-[345px] w-full max-w-sm mx-auto"
     style={{
       x,
       rotate,

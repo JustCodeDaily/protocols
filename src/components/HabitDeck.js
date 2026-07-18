@@ -54,7 +54,7 @@ export function HabitDeck({ initialHabits, userId, activeHabitsCount, userName }
   }
   const stack = [...visibleDeck].reverse();
   return <div className="flex h-full w-full flex-col items-center justify-center">
-      <div className="relative h-96 w-full max-w-sm">
+      <div className="relative h-[345px] w-full max-w-sm">
         {stack.map((habit, index) => {
     const isTop = index === stack.length - 1;
     return <HabitCard
