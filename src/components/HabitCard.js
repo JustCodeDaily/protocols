@@ -4,15 +4,16 @@ import { FiThumbsUp as ThumbsUp, FiThumbsDown as ThumbsDown } from "react-icons/
 export function HabitCard({ habit, isTop, onSwipe, zIndex }) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-180, 180], [-45, 45]);
+  const restrictSwipe = habit.restrictSwipe;
   const opacity = useTransform(x, [-250, -150, 0, 150, 250], [0, 1, 1, 1, 0]);
-  const yesOpacity = useTransform(x, [0, 150], [0, 1]);
-  const noOpacity = useTransform(x, [0, -150], [0, 1]);
+  const yesOpacity = useTransform(x, [0, 150], [0, restrictSwipe === "right" ? 0 : 1]);
+  const noOpacity = useTransform(x, [0, -150], [0, restrictSwipe === "left" ? 0 : 1]);
 
   const handleDragEnd = (e, info) => {
     const threshold = 180;
-    if (info.offset.x > threshold) {
+    if (info.offset.x > threshold && restrictSwipe !== "right") {
       onSwipe("right");
-    } else if (info.offset.x < -threshold) {
+    } else if (info.offset.x < -threshold && restrictSwipe !== "left") {
       onSwipe("left");
     }
   }
@@ -27,6 +28,11 @@ export function HabitCard({ habit, isTop, onSwipe, zIndex }) {
     }}
     drag={isTop ? "x" : false}
     dragConstraints={{ left: 0, right: 0 }}
+    dragElastic={
+      restrictSwipe === "left" ? { left: 0, right: 0.5 } :
+      restrictSwipe === "right" ? { left: 0.5, right: 0 } : 
+      0.5
+    }
     onDragEnd={handleDragEnd}
     animate={{
       scale: isTop ? 1 : 0.95,

@@ -5,7 +5,7 @@ import { DoneState } from "./DoneState";
 import { FiChevronLeft as ChevronLeft, FiChevronRight as ChevronRight } from "react-icons/fi";
 import { createClient } from "@/lib/supabase/client";
 import { format } from "date-fns";
-export function HabitDeck({ initialHabits, userId }) {
+export function HabitDeck({ initialHabits, userId, activeHabitsCount, userName }) {
   const supabase = createClient();
   const [deck, setDeck] = useState(initialHabits);
   const [answeredIds, setAnsweredIds] = useState(new Set());
@@ -50,7 +50,7 @@ export function HabitDeck({ initialHabits, userId }) {
     });
   };
   if (visibleDeck.length === 0) {
-    return <DoneState />;
+    return <DoneState activeHabitsCount={activeHabitsCount} userName={userName} />;
   }
   const stack = [...visibleDeck].reverse();
   return <div className="flex h-full w-full flex-col items-center justify-center">
@@ -68,20 +68,26 @@ export function HabitDeck({ initialHabits, userId }) {
       </div>
 
       <div className="mt-12 flex gap-6">
-        <button
-          onClick={handlePrev}
-          className="rounded-full bg-zinc-100 p-4 text-zinc-500 transition-colors hover:bg-zinc-200 active:bg-zinc-300 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
-          aria-label="Previous question"
-        >
-          <ChevronLeft className="h-8 w-8" />
-        </button>
-        <button
-          onClick={handleNext}
-          className="rounded-full bg-zinc-100 p-4 text-zinc-500 transition-colors hover:bg-zinc-200 active:bg-zinc-300 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
-          aria-label="Next question"
-        >
-          <ChevronRight className="h-8 w-8" />
-        </button>
+        <div className="flex flex-col items-center gap-2">
+          <button
+            onClick={handlePrev}
+            className="rounded-full bg-zinc-100 p-4 text-zinc-500 transition-colors hover:bg-zinc-200 active:bg-zinc-300 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            aria-label="Previous question"
+          >
+            <ChevronLeft className="h-8 w-8" />
+          </button>
+          <span className="text-xs text-zinc-400 font-medium">Previous Habit</span>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <button
+            onClick={handleNext}
+            className="rounded-full bg-zinc-100 p-4 text-zinc-500 transition-colors hover:bg-zinc-200 active:bg-zinc-300 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            aria-label="Next question"
+          >
+            <ChevronRight className="h-8 w-8" />
+          </button>
+          <span className="text-xs text-zinc-400 font-medium">Next Habit</span>
+        </div>
       </div>
     </div>;
 }
