@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SwipeHabit
+
+A modern, mobile-first, swipe-based habit tracker. One habit = one question on a card. You answer by swiping!
+
+## Architecture
+
+Below is the high-level architecture flow of the SwipeHabit application:
+
+```mermaid
+flowchart TD
+    subgraph Client ["Client (Browser/PWA)"]
+        UI[Next.js React Server & Client Components]
+        Gestures[Framer Motion - Swipe Engine]
+        Charts[Recharts - Analytics]
+        
+        UI --> Gestures
+        UI --> Charts
+    end
+
+    subgraph Backend ["Backend as a Service"]
+        Supabase[Supabase]
+        Auth[Google OAuth (PKCE Flow)]
+        DB[(PostgreSQL Database)]
+        RLS[Row Level Security]
+
+        Supabase --> Auth
+        Supabase --> RLS
+        RLS --> DB
+    end
+
+    Client -- "Reads/Writes (Anon Key)" --> Supabase
+    Auth -- "Validates User Session" --> Client
+```
+
+## Features
+
+- **Tinder-Style Swiping**: 
+  - Swipe right for Yes 👍
+  - Swipe left for No 👎
+  - Use the chevron buttons to skip a habit for now (sends it to the back of the deck).
+- **Daily Deck**: Swiped habits are removed from the deck for the day. Once all habits are answered, you are greeted with a calming "Done" state.
+- **Habit Management**: Add, edit, and organize your daily questions.
+- **Analytics Dashboard**: Visualize your habit completion rates with Today, Weekly, Monthly, and Overall views.
+- **Secure Authentication**: Google OAuth powered by Supabase with Row Level Security (RLS) to ensure your data stays private.
+- **Dark & Light Mode**: Built-in theme toggle that respects your system preferences.
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router) & React 19
+- **Styling**: Tailwind CSS
+- **Database & Auth**: Supabase (PostgreSQL, RLS, PKCE OAuth)
+- **Animations**: Framer Motion
+- **Charts**: Recharts
+- **Date Parsing**: date-fns
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 20+
+- A [Supabase](https://supabase.com/) project
+- A Google Cloud Console project (for OAuth Keys)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Installation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd protocols
+   ```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Set up your environment variables:
+   Create a `.env.local` file in the root directory and add your Supabase credentials alongside your Google OAuth Keys:
+   ```env
+   # Supabase Setup
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-## Learn More
+   # Authentication setup
+   SUPABASE_JWT_SECRET=your_jwt_secret
 
-To learn more about Next.js, take a look at the following resources:
+   # Google OAuth Keys
+   NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Database Setup:
+   Ensure you have created the `habits` and `habit_logs` tables in your Supabase project, along with the appropriate Row Level Security (RLS) policies.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
