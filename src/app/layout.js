@@ -9,7 +9,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"]
 });
 export const metadata = {
-  title: "SwipeHabit",
+  title: "Protocols",
   description: "A private, swipe-based habit tracker.",
 };
 
@@ -31,6 +31,15 @@ export default function RootLayout({ children }) {
                   document.documentElement.classList.add('dark')
                 } else {
                   document.documentElement.classList.remove('dark')
+                }
+              } catch (_) {}
+              try {
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                      registration.unregister();
+                    }
+                  });
                 }
               } catch (_) {}
             `,
