@@ -14,6 +14,7 @@ export const metadata = {
 };
 
 import { TopNav } from "@/components/TopNav";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function RootLayout({ children }) {
   return <html
@@ -49,6 +50,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col relative">
           <TopNav />
           {children}
+          <Analytics />
       </body>
     </html>;
 }
