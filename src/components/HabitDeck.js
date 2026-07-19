@@ -57,11 +57,16 @@ export function HabitDeck({ initialHabits, userId, activeHabitsCount, userName }
       <div className="relative h-[345px] w-full max-w-sm">
         {stack.map((habit, index) => {
     const isTop = index === stack.length - 1;
+    const answeredCount = activeHabitsCount - initialHabits.length;
+    const originalIndex = answeredCount + initialHabits.findIndex(h => h.id === habit.id) + 1;
+    const totalHabits = activeHabitsCount;
     return <HabitCard
       key={habit.id}
       habit={habit}
       isTop={isTop}
       zIndex={index}
+      habitIndex={originalIndex}
+      totalHabits={totalHabits}
       onSwipe={(direction) => handleSwipe(habit.id, direction)}
     />;
   })}

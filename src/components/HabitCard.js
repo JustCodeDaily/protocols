@@ -1,7 +1,7 @@
 "use client";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { FiThumbsUp as ThumbsUp, FiThumbsDown as ThumbsDown } from "react-icons/fi";
-export function HabitCard({ habit, isTop, onSwipe, zIndex }) {
+export function HabitCard({ habit, isTop, onSwipe, zIndex, habitIndex, totalHabits }) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-180, 180], [-45, 45]);
   const restrictSwipe = habit.restrictSwipe;
@@ -49,6 +49,12 @@ export function HabitCard({ habit, isTop, onSwipe, zIndex }) {
         <motion.div style={{ opacity: noOpacity }} className="absolute top-8 left-8 -rotate-12 rounded-full bg-rose-100/50 dark:bg-rose-500/20 p-3 text-rose-500 pointer-events-none">
           <ThumbsDown className="h-8 w-8" strokeWidth={2.5} />
         </motion.div>
+
+        {habitIndex != null && totalHabits != null ? (
+          <div className="absolute top-8 text-xs font-semibold tracking-widest text-zinc-400 dark:text-zinc-500 z-10">
+            {String(habitIndex).padStart(2, '0')}/{String(totalHabits).padStart(2, '0')}
+          </div>
+        ) : null}
 
         <h3 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 z-10">
           {habit.question}
