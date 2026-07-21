@@ -10,6 +10,7 @@ export function QuestionsList({ initialHabits, userId }) {
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editQuestion, setEditQuestion] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   
   const handleAdd = async () => {
     if (!newTitle.trim() || !newQuestion.trim()) return;
@@ -30,9 +31,12 @@ export function QuestionsList({ initialHabits, userId }) {
   };
   const handleDelete = async (id) => {
     const { error } = await supabase.from("habits").update({ active: false }).eq("id", id);
-    if (!error) {
-      setHabits(habits.filter((h) => h.id !== id));
+    if (error) {
+      alert("Failed to delete habit: " + error.message);
+      return;
     }
+    setHabits((prev) => prev.filter((h) => h.id !== id));
+    setConfirmDeleteId(null);
   };
   const startEdit = (h) => {
     setEditingId(h.id);
@@ -103,12 +107,23 @@ export function QuestionsList({ initialHabits, userId }) {
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">{h.title}</p>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => startEdit(h)} className="p-2 text-zinc-400 hover:text-blue-500">
+                    <button type="button" aria-label="Edit habit" onClick={() => { setConfirmDeleteId(null); startEdit(h); }} className="p-2 text-zinc-400 hover:text-blue-500">
                       <Edit2 className="h-4 w-4" />
                     </button>
-                    <button onClick={() => handleDelete(h.id)} className="p-2 text-zinc-400 hover:text-red-500">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    {confirmDeleteId === h.id ? (
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => handleDelete(h.id)} className="rounded-lg px-2 py-1 text-xs font-medium text-white bg-red-500 hover:bg-red-600">
+                          Delete
+                        </button>
+                        <button onClick={() => setConfirmDeleteId(null)} className="rounded-lg px-2 py-1 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button type="button" aria-label="Delete habit" onClick={() => setConfirmDeleteId(h.id)} className="p-2 text-zinc-400 hover:text-red-500">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </>}
